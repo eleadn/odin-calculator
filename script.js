@@ -66,6 +66,18 @@ function resetOperation(operation)
     operation.operatorChanged = false;
 }
 
+function setOperationNumber(operation, strValue)
+{
+    if (operation.operator === null)
+    {
+        operation.leftOperand = Number.parseInt(strValue);
+    }
+    else
+    {
+        operation.rightOperand = Number.parseInt(strValue);
+    }
+}
+
 function onNumberButtonClick(numberButton, operation, display, preview)
 {
     if (operation.submitted || operation.operatorChanged)
@@ -88,14 +100,7 @@ function onNumberButtonClick(numberButton, operation, display, preview)
         display.textContent += numberButton.textContent;
     }
 
-    if (operation.operator === null)
-    {
-        operation.leftOperand = Number.parseInt(display.textContent);
-    }
-    else
-    {
-        operation.rightOperand = Number.parseInt(display.textContent);
-    }
+    setOperationNumber(operation, display.textContent);
 }
 
 function onClearButtonClick(operation, display, preview)
@@ -161,14 +166,26 @@ function onDeleteClick(operation, display)
         display.textContent = display.textContent.slice(0, display.textContent.length - 1);
     }
 
-    if (operation.operator === null)
+    setOperationNumber(operation, display.textContent);
+}
+
+function onSignClick(operation, display)
+{
+    if (operation.submitted || operation.operatorChanged || operation.leftOperand === 0)
     {
-        operation.leftOperand = Number.parseInt(display.textContent);
+        return;
     }
-    else
+
+    if (display.textContent.at(0) === "-")
     {
-        operation.rightOperand = Number.parseInt(display.textContent);
+        display.textContent = display.textContent.slice(1);
     }
+    else if (display.textContent.length < 9)
+    {
+        display.textContent = `-${display.textContent}`;
+    }
+
+    setOperationNumber(operation, display.textContent);
 }
 
 const currentDisplay = document.querySelector(".current");
@@ -176,6 +193,7 @@ const previewDisplay = document.querySelector(".preview");
 const clearButton = document.querySelector(".clear");
 const submitButton = document.querySelector(".submit");
 const deleteButton = document.querySelector(".delete");
+const signButton = document.querySelector(".sign");
 const numberButtons = document.querySelectorAll(".number");
 const operatorButtons = document.querySelectorAll(".operator");
 let operation = new Operation(0);
@@ -187,3 +205,4 @@ operatorButtons.forEach(operatorButton => operatorButton.addEventListener("click
     context => onOperatorClick(context.target, operation, currentDisplay, previewDisplay)));
 submitButton.addEventListener("click", () => onSubmitClick(operation, currentDisplay, previewDisplay));
 deleteButton.addEventListener("click", () => onDeleteClick(operation, currentDisplay));
+signButton.addEventListener("click", () => onSignClick(operation, currentDisplay));
