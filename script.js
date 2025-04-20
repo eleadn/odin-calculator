@@ -145,10 +145,37 @@ function onSubmitClick(operation, display, preview)
     operation.submitted = true;
 }
 
+function onDeleteClick(operation, display)
+{
+    if (operation.submitted || operation.operatorChanged)
+    {
+        return;
+    }
+
+    if (display.textContent.length === 1)
+    {
+        display.textContent = "0";
+    }
+    else
+    {
+        display.textContent = display.textContent.slice(0, display.textContent.length - 1);
+    }
+
+    if (operation.operator === null)
+    {
+        operation.leftOperand = Number.parseInt(display.textContent);
+    }
+    else
+    {
+        operation.rightOperand = Number.parseInt(display.textContent);
+    }
+}
+
 const currentDisplay = document.querySelector(".current");
 const previewDisplay = document.querySelector(".preview");
 const clearButton = document.querySelector(".clear");
 const submitButton = document.querySelector(".submit");
+const deleteButton = document.querySelector(".delete");
 const numberButtons = document.querySelectorAll(".number");
 const operatorButtons = document.querySelectorAll(".operator");
 let operation = new Operation(0);
@@ -159,3 +186,4 @@ clearButton.addEventListener("click", () => onClearButtonClick(operation, curren
 operatorButtons.forEach(operatorButton => operatorButton.addEventListener("click",
     context => onOperatorClick(context.target, operation, currentDisplay, previewDisplay)));
 submitButton.addEventListener("click", () => onSubmitClick(operation, currentDisplay, previewDisplay));
+deleteButton.addEventListener("click", () => onDeleteClick(operation, currentDisplay));
