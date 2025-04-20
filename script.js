@@ -70,11 +70,11 @@ function setOperationNumber(operation, strValue)
 {
     if (operation.operator === null)
     {
-        operation.leftOperand = Number.parseInt(strValue);
+        operation.leftOperand = Number.parseFloat(strValue);
     }
     else
     {
-        operation.rightOperand = Number.parseInt(strValue);
+        operation.rightOperand = Number.parseFloat(strValue);
     }
 }
 
@@ -123,8 +123,12 @@ function onOperatorClick(operatorButton, operation, display, preview)
 
     operation.operator = operatorButton.textContent;
     preview.textContent = `${operation.leftOperand}${operation.operator}`;
-    operation.rightOperand = Number.parseInt(display.textContent);
+    operation.rightOperand = Number.parseFloat(display.textContent);
     operation.operatorChanged = true;
+    if (operation.submitted)
+    {
+        operation.submitted = false;
+    }
 }
 
 function onSubmitClick(operation, display, preview)
@@ -144,7 +148,7 @@ function onSubmitClick(operation, display, preview)
     {
         operate(operation);
         preview.textContent = `${operation.leftOperand}${operation.operator}${operation.rightOperand}=`;
-        display.textContent = operation.result;
+        display.textContent = operation.result.toString().length <= 9 ? operation.result : "TOO LONG";
     }
 
     operation.submitted = true;
@@ -188,12 +192,23 @@ function onSignClick(operation, display)
     setOperationNumber(operation, display.textContent);
 }
 
+function onDotClick(display)
+{
+    if (operation.submitted || operation.operatorChanged || display.textContent.includes(".") || display.textContent.length >= 9)
+    {
+        return;
+    }
+
+    display.textContent = `${display.textContent}.`;
+}
+
 const currentDisplay = document.querySelector(".current");
 const previewDisplay = document.querySelector(".preview");
 const clearButton = document.querySelector(".clear");
 const submitButton = document.querySelector(".submit");
 const deleteButton = document.querySelector(".delete");
 const signButton = document.querySelector(".sign");
+const dotButton = document.querySelector(".dot");
 const numberButtons = document.querySelectorAll(".number");
 const operatorButtons = document.querySelectorAll(".operator");
 let operation = new Operation(0);
@@ -206,3 +221,4 @@ operatorButtons.forEach(operatorButton => operatorButton.addEventListener("click
 submitButton.addEventListener("click", () => onSubmitClick(operation, currentDisplay, previewDisplay));
 deleteButton.addEventListener("click", () => onDeleteClick(operation, currentDisplay));
 signButton.addEventListener("click", () => onSignClick(operation, currentDisplay));
+dotButton.addEventListener("click", () => onDotClick(currentDisplay));
