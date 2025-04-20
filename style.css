@@ -66,32 +66,37 @@ body
     flex: 8;
 }
 
-.number
+#zero
+{
+    flex: 2.222;
+}
+
+.number, .dot
 {
     background-color: #f79858;
 } 
 
-.number:active
+.number:active, .dot:active
 {
     background-color: #F57A27;
 }
 
-.clear, .submit
+.clear, .sign, .delete
 {
     background-color: #f17628;
 }
 
-.clear:active, .submit:active
+.clear:active, .sign:active, .delete:active
 {
     background-color: #D85C0E;
 }
 
-.operator
+.operator, .submit
 {
     background-color: #d63226;
 }
 
-.operator:active
+.operator:active, .submit:active
 {
     background-color: #E0594F;
 }

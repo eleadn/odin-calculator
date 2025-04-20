@@ -52,32 +52,42 @@ function Operation(leftOperand = null, operator = null, rightOperand = null)
     obj.rightOperand = rightOperand;
     obj.result = null;
     obj.submitted = false;
+    obj.operatorChanged = false;
     return obj;
 }
 
 function resetOperation(operation)
 {
-    operation.leftOperand = null;
+    operation.leftOperand = 0;
     operation.operator = null;
     operation.rightOperand = null;
     operation.result = null;
     operation.submitted = false;
+    operation.operatorChanged = false;
 }
 
 function onNumberButtonClick(numberButton, operation, display, preview)
 {
-    if (operation.submitted)
+    if (operation.submitted || operation.operatorChanged)
     {
-        preview.textContent = "";
-        display.textContent = "";
-        resetOperation(operation);
+        if (operation.submitted)
+        {
+            preview.textContent = "";
+            resetOperation(operation);
+        }
+        display.textContent = "0";
+        operation.operatorChanged = false;
     }
 
-    if (display.textContent.length < 9)
+    if (display.textContent === "0")
+    {
+        display.textContent = numberButton.textContent;
+    }
+    else if (display.textContent.length < 9)
     {
         display.textContent += numberButton.textContent;
     }
-    
+
     if (operation.operator === null)
     {
         operation.leftOperand = Number.parseInt(display.textContent);
@@ -91,37 +101,30 @@ function onNumberButtonClick(numberButton, operation, display, preview)
 function onClearButtonClick(operation, display, preview)
 {
     resetOperation(operation);
-    display.textContent = "";
+    display.textContent = "0";
     preview.textContent = "";
 }
 
 function onOperatorClick(operatorButton, operation, display, preview)
 {
-    if (operation.leftOperand === null)
-    {
-        return;
-    }
-
-    if (operation.rightOperand !== null)
+    if (operation.rightOperand !== null && !operation.operatorChanged)
     {
         operate(operation);
         const result = operation.result;
         resetOperation(operation);
         operation.leftOperand = result;
+        display.textContent = operation.leftOperand;
     }
 
     operation.operator = operatorButton.textContent;
     preview.textContent = `${operation.leftOperand}${operation.operator}`;
-    display.textContent = "";
+    operation.rightOperand = Number.parseInt(display.textContent);
+    operation.operatorChanged = true;
 }
 
 function onSubmitClick(operation, display, preview)
 {
-    if (operation.leftOperand === null)
-    {
-        return;
-    }
-    else if (operation.rightOperand === null || operation.result !== null)
+    if (operation.rightOperand === null || operation.result !== null)
     {
         if (operation.result !== null)
         {
@@ -148,7 +151,7 @@ const clearButton = document.querySelector(".clear");
 const submitButton = document.querySelector(".submit");
 const numberButtons = document.querySelectorAll(".number");
 const operatorButtons = document.querySelectorAll(".operator");
-let operation = new Operation();
+let operation = new Operation(0);
 
 numberButtons.forEach(numberButton => numberButton.addEventListener("click",
     context => onNumberButtonClick(context.target, operation, currentDisplay, previewDisplay)));
