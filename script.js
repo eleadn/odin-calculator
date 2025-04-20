@@ -15,6 +15,10 @@ function multiply(a, b)
 
 function divide(a, b)
 {
+    if (b === 0)
+    {
+        return "ERROR";
+    }
     return a / b;
 }
 
@@ -47,16 +51,33 @@ function Operation(leftOperand = null, operator = null, rightOperand = null)
     obj.operator = operator;
     obj.rightOperand = rightOperand;
     obj.result = null;
+    obj.submitted = false;
     return obj;
 }
 
-function onNumberButtonClick(numberButton, operation, display)
+function resetOperation(operation)
 {
+    operation.leftOperand = null;
+    operation.operator = null;
+    operation.rightOperand = null;
+    operation.result = null;
+    operation.submitted = false;
+}
+
+function onNumberButtonClick(numberButton, operation, display, preview)
+{
+    if (operation.submitted)
+    {
+        preview.textContent = "";
+        display.textContent = "";
+        resetOperation(operation);
+    }
+
     if (display.textContent.length < 9)
     {
         display.textContent += numberButton.textContent;
     }
-
+    
     if (operation.operator === null)
     {
         operation.leftOperand = Number.parseInt(display.textContent);
@@ -69,10 +90,7 @@ function onNumberButtonClick(numberButton, operation, display)
 
 function onClearButtonClick(operation, display, preview)
 {
-    operation.leftOperand = null;
-    operation.operator = null;
-    operation.rightOperand = null;
-    operation.result = null;
+    resetOperation(operation);
     display.textContent = "";
     preview.textContent = "";
 }
@@ -84,6 +102,14 @@ function onOperatorClick(operatorButton, operation, display, preview)
         return;
     }
 
+    if (operation.rightOperand !== null)
+    {
+        operate(operation);
+        const result = operation.result;
+        resetOperation(operation);
+        operation.leftOperand = result;
+    }
+
     operation.operator = operatorButton.textContent;
     preview.textContent = `${operation.leftOperand}${operation.operator}`;
     display.textContent = "";
@@ -91,9 +117,29 @@ function onOperatorClick(operatorButton, operation, display, preview)
 
 function onSubmitClick(operation, display, preview)
 {
-    operate(operation);
-    preview.textContent = `${operation.leftOperand}${operation.operator}${operation.rightOperand}=`;
-    display.textContent = operation.result;
+    if (operation.leftOperand === null)
+    {
+        return;
+    }
+    else if (operation.rightOperand === null || operation.result !== null)
+    {
+        if (operation.result !== null)
+        {
+            const result = operation.result;
+            resetOperation(operation);
+            operation.leftOperand = result;
+        }
+        preview.textContent = `${operation.leftOperand}=`;
+        display.textContent = `${operation.leftOperand}`;
+    }
+    else
+    {
+        operate(operation);
+        preview.textContent = `${operation.leftOperand}${operation.operator}${operation.rightOperand}=`;
+        display.textContent = operation.result;
+    }
+
+    operation.submitted = true;
 }
 
 const currentDisplay = document.querySelector(".current");
@@ -105,7 +151,7 @@ const operatorButtons = document.querySelectorAll(".operator");
 let operation = new Operation();
 
 numberButtons.forEach(numberButton => numberButton.addEventListener("click",
-    context => onNumberButtonClick(context.target, operation, currentDisplay)));
+    context => onNumberButtonClick(context.target, operation, currentDisplay, previewDisplay)));
 clearButton.addEventListener("click", () => onClearButtonClick(operation, currentDisplay, previewDisplay));
 operatorButtons.forEach(operatorButton => operatorButton.addEventListener("click",
     context => onOperatorClick(context.target, operation, currentDisplay, previewDisplay)));
