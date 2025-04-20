@@ -28,7 +28,7 @@ function operate(operation)
         case "-":
             operation.result = substract(operation.leftOperand, operation.rightOperand);
             break;
-        case "*":
+        case "x":
             operation.result = multiply(operation.leftOperand, operation.rightOperand);
             break;
         case "/":
@@ -40,17 +40,17 @@ function operate(operation)
     }
 }
 
-let operation = 
+function Operation(leftOperand = null, operator = null, rightOperand = null)
 {
-    leftOperand: null,
-    operator: null,
-    rightOperand: null,
-    result: null,
-};
+    const obj = {};
+    obj.leftOperand = leftOperand;
+    obj.operator = operator;
+    obj.rightOperand = rightOperand;
+    obj.result = null;
+    return obj;
+}
 
-operation.leftOperand = 3;
-operation.operator = "+";
-operation.rightOperand = 5;
+let operation = new Operation(3, "+", 5);
 
 operate(operation);
 
